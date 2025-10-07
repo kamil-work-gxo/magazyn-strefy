@@ -18,7 +18,6 @@ if (currentUser) {
 
 // logowanie – tylko istniejący użytkownicy
 loginBtn.addEventListener("click", async () => {
-loginBtn.addEventListener("click", async () => {
   const name = usernameInput.value.trim();
   if (!name) return alert("Podaj imię i nazwisko!");
 
