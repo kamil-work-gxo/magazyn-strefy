@@ -8,15 +8,17 @@ const loginBtn = document.getElementById("loginBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 const userZone = document.getElementById("userZone");
 const zoneUsers = document.getElementById("zoneUsers");
-const loggedAs = document.getElementById("loggedAs"); // ✅ dodane
+const loggedAs = document.getElementById("loggedAs");
 
 let currentUser = localStorage.getItem("username");
 
-// jeśli użytkownik jest w localStorage, pokaz aplikację
-if (currentUser) {
-  showApp(currentUser);
-  if (loggedAs) loggedAs.textContent = `Zalogowany jako: ${currentUser}`;
-}
+// 🔹 czekamy aż DOM się załaduje
+document.addEventListener("DOMContentLoaded", () => {
+  if (currentUser) {
+    if (loggedAs) loggedAs.textContent = `Zalogowany jako: ${currentUser}`;
+    showApp(currentUser);
+  }
+});
 
 // logowanie – tylko istniejący użytkownicy
 loginBtn.addEventListener("click", async () => {
@@ -30,16 +32,11 @@ loginBtn.addEventListener("click", async () => {
     return alert("Użytkownik nie istnieje. Skontaktuj się z administratorem.");
   }
 
-  const user = snapshot.val(); // ✅ pobierz dane użytkownika
-  if (loggedAs) loggedAs.textContent = `Zalogowany jako: ${user.name}`; // ✅ ustaw nazwę użytkownika
+  const user = snapshot.val();
+  if (loggedAs) loggedAs.textContent = `Zalogowany jako: ${user.name}`;
 
-  console.log("Logowanie użytkownika:", name);
-  console.log("Referencja Firebase:", userRef);
-
-  // ustawienie online
   try {
     await update(userRef, { online: true });
-    console.log("Online ustawione!");
   } catch (err) {
     console.error("Błąd przy ustawianiu online:", err);
   }
@@ -55,10 +52,11 @@ logoutBtn.addEventListener("click", async () => {
     await update(ref(db, "users/" + formatKey(name)), { online: false, zone: null });
   }
   localStorage.removeItem("username");
+  if (loggedAs) loggedAs.textContent = "";
   location.reload();
 });
 
-// formatowanie nazwy użytkownika na klucz w Firebase
+// formatowanie klucza Firebase
 function formatKey(name) {
   return name.toLowerCase().replace(/\s+/g, "_");
 }
@@ -69,22 +67,19 @@ function showApp(name) {
   appDiv.classList.remove("hidden");
   currentUser = name;
 
-  if (loggedAs) loggedAs.textContent = `Zalogowany jako: ${name}`; // ✅ działa też przy automatycznym logowaniu
+  if (loggedAs) loggedAs.textContent = `Zalogowany jako: ${name}`;
 
   const userRef = ref(db, "users/" + formatKey(name));
 
-  // nasłuchiwanie zmian użytkownika
   onValue(userRef, (snap) => {
     const data = snap.val();
     if (!data) return;
-
     const zone = data.zone;
     userZone.textContent = zone ? zone : "Nie przypisano do strefy";
-
     loadZoneUsers(zone);
   });
 
-  // ustawienie offline przy zamknięciu strony (strefa pozostaje)
+  // ustaw offline przy zamknięciu strony
   window.addEventListener("beforeunload", async () => {
     const name = localStorage.getItem("username");
     if (name) {
@@ -93,7 +88,7 @@ function showApp(name) {
   });
 }
 
-// wczytanie wszystkich użytkowników przypisanych do tej samej strefy
+// wczytanie użytkowników ze strefy
 function loadZoneUsers(zone) {
   if (!zone) {
     zoneUsers.innerHTML = "<li>Brak przypisania</li>";
@@ -107,6 +102,7 @@ function loadZoneUsers(zone) {
       zoneUsers.innerHTML = "<li>Brak użytkowników w strefie</li>";
       return;
     }
+
     const list = Object.values(users).filter(u => u.zone === zone);
     zoneUsers.innerHTML = list.length
       ? list.map(u => `<li>${u.name}</li>`).join("")
