@@ -18,6 +18,7 @@ if (currentUser) {
 
 // logowanie – tylko istniejący użytkownicy
 loginBtn.addEventListener("click", async () => {
+loginBtn.addEventListener("click", async () => {
   const name = usernameInput.value.trim();
   if (!name) return alert("Podaj imię i nazwisko!");
 
@@ -28,9 +29,19 @@ loginBtn.addEventListener("click", async () => {
     return alert("Użytkownik nie istnieje. Skontaktuj się z administratorem.");
   }
 
-  // użytkownik istnieje → logujemy i ustawiamy online
+  // DEBUG
+  console.log("Logowanie użytkownika:", name);
+  console.log("Referencja Firebase:", userRef);
+
+  // ustawienie online
+  try {
+    await update(userRef, { online: true });
+    console.log("Online ustawione!");
+  } catch (err) {
+    console.error("Błąd przy ustawianiu online:", err);
+  }
+
   localStorage.setItem("username", name);
-  await update(userRef, { online: true });
   showApp(name);
 });
 
