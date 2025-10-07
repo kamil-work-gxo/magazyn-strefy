@@ -38,9 +38,10 @@ function renderTable() {
     <p>Przypisanych do stref: ${totalAssigned}</p>
     <p>Nieprzypisanych: ${totalUnassigned}</p>
     ${Object.entries(zonesData).map(([key, z]) => {
-      const count = loggedUsers.filter(([k, u]) => u.zone === key).length;
-      return `<p>Strefa "${z.name}": ${count}</p>`;
-    }).join("")}
+  const count = loggedUsers.filter(([k, u]) => u.zone === key).length;
+  const name = z?.name ?? key; // jeśli z jest undefined, użyj klucza
+  return `<p>Strefa "${name}": ${count}</p>`;
+}).join("")}
   `;
 
   // Budowanie tabeli: najpierw nieprzypisani, potem przypisani
