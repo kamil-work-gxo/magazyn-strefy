@@ -73,10 +73,15 @@ function showApp(name) {
   });
 
   // ustawienie offline przy zamknięciu strony
-  window.addEventListener("beforeunload", async () => {
-    await update(ref(db, "users/" + formatKey(name)), { online: false });
-  });
-}
+  window.addEventListener("beforeunload", () => {
+  const name = localStorage.getItem("username");
+  if (name) {
+    // navigator.sendBeacon działa asynchronicznie przy zamykaniu strony
+    const url = `https://magazyn-strefy-default-rtdb.europe-west1.firebasedatabase.app/users/${formatKey(name)}.json`;
+    const payload = JSON.stringify({ online: false, zone: null });
+    navigator.sendBeacon(url, payload);
+  }
+});
 
 // wczytanie wszystkich użytkowników przypisanych do tej samej strefy
 function loadZoneUsers(zone) {
