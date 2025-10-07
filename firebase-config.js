@@ -7,7 +7,7 @@ const firebaseConfig = {
   authDomain: "magazyn-strefy.firebaseapp.com",
   databaseURL: "https://magazyn-strefy-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "magazyn-strefy",
-  storageBucket: "magazyn-strefy.firebasestorage.app",
+  storageBucket: "magazyn-strefy.appspot.com",
   messagingSenderId: "588000222819",
   appId: "1:588000222819:web:9168e656dddb01c6fce256"
 };
