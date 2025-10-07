@@ -27,7 +27,7 @@ loginBtn.addEventListener("click", async () => {
   if (!snapshot.exists()) {
     return alert("Użytkownik nie istnieje. Skontaktuj się z administratorem.");
   }
-
+document.getElementById("loggedAs").textContent = `Zalogowany jako: ${user.name}`;
   // DEBUG
   console.log("Logowanie użytkownika:", name);
   console.log("Referencja Firebase:", userRef);
