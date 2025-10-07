@@ -21,8 +21,16 @@ loginBtn.addEventListener("click", async () => {
   const name = usernameInput.value.trim();
   if (!name) return alert("Podaj imię i nazwisko!");
 
+  const userRef = ref(db, "users/" + formatKey(name));
+  const snapshot = await get(userRef);
+
+  if (!snapshot.exists()) {
+    return alert("Użytkownik nie istnieje. Skontaktuj się z administratorem.");
+  }
+
+  // użytkownik istnieje → logujemy i ustawiamy online
   localStorage.setItem("username", name);
-  await ensureUserExists(name);
+  await update(userRef, { online: true });
   showApp(name);
 });
 
