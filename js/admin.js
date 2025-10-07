@@ -6,13 +6,13 @@ const SECRET_KEY = "sekret123"; // zmień na swoje
 
 const adminPanel = document.getElementById("adminPanel");
 const auth = document.getElementById("auth");
-const usersTable = document.getElementById("usersTable");
 const addUserBtn = document.getElementById("addUser");
 const addZoneBtn = document.getElementById("addZone");
 const userNameInput = document.getElementById("userName");
 const zoneNameInput = document.getElementById("zoneName");
 const zoneColorInput = document.getElementById("zoneColor");
-const statsDiv = document.getElementById("stats");
+const usersList = document.getElementById("usersList");
+const zonesList = document.getElementById("zonesList");
 
 if (key === SECRET_KEY) {
   auth.classList.add("hidden");
@@ -24,11 +24,11 @@ function formatKey(name) {
   return name.toLowerCase().replace(/\s+/g, "_");
 }
 
-async function init() {
+function init() {
   addUserBtn.addEventListener("click", async () => {
     const name = userNameInput.value.trim();
     if (!name) return;
-    await set(ref(db, "users/" + formatKey(name)), { name, zone: null });
+    await set(ref(db, "users/" + formatKey(name)), { name, zone: null, online: false });
     userNameInput.value = "";
   });
 
@@ -40,59 +40,35 @@ async function init() {
     zoneNameInput.value = "";
   });
 
+  // Lista użytkowników
   onValue(ref(db, "users"), (snap) => {
     const users = snap.val() || {};
-    renderUsers(users);
+    usersList.innerHTML = "";
+    for (const key in users) {
+      const li = document.createElement("li");
+      li.textContent = users[key].name;
+      const btn = document.createElement("button");
+      btn.textContent = "Usuń";
+      btn.className = "ml-2 text-red-500";
+      btn.onclick = () => set(ref(db, "users/" + key), null);
+      li.appendChild(btn);
+      usersList.appendChild(li);
+    }
   });
 
+  // Lista stref
   onValue(ref(db, "zones"), (snap) => {
     const zones = snap.val() || {};
-    renderZones(zones);
-  });
-}
-
-function renderUsers(users) {
-  const usersArray = Object.values(users);
-  const total = usersArray.length;
-  const assigned = usersArray.filter(u => u.zone).length;
-  const unassigned = total - assigned;
-
-  statsDiv.innerHTML = `
-    <p>Łącznie użytkowników: ${total}</p>
-    <p>Przypisani do stref: ${assigned}</p>
-    <p>Nieprzypisani: ${unassigned}</p>
-  `;
-
-  usersTable.innerHTML = "";
-  for (const key in users) {
-    const u = users[key];
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="border p-2">${u.name}</td>
-      <td class="border p-2">${u.zone ?? "-"}</td>
-      <td class="border p-2">
-        <select class="border rounded p-1 zoneSelect" data-user="${key}">
-          <option value="">---</option>
-        </select>
-      </td>
-    `;
-    usersTable.appendChild(tr);
-  }
-
-  updateZoneDropdowns();
-}
-
-function renderZones(zones) {
-  const selects = document.querySelectorAll(".zoneSelect");
-  selects.forEach(sel => {
-    sel.innerHTML = '<option value="">---</option>';
-    for (const [name, z] of Object.entries(zones)) {
-      sel.innerHTML += `<option value="${name}" style="background:${z.color}">${name}</option>`;
+    zonesList.innerHTML = "";
+    for (const key in zones) {
+      const li = document.createElement("li");
+      li.textContent = `${key} (${zones[key].color})`;
+      const btn = document.createElement("button");
+      btn.textContent = "Usuń";
+      btn.className = "ml-2 text-red-500";
+      btn.onclick = () => set(ref(db, "zones/" + key), null);
+      li.appendChild(btn);
+      zonesList.appendChild(li);
     }
-    sel.addEventListener("change", async (e) => {
-      const userKey = e.target.dataset.user;
-      const zone = e.target.value || null;
-      await update(ref(db, "users/" + userKey), { zone });
-    });
   });
 }
