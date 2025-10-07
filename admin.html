@@ -13,35 +13,22 @@
   </div>
 
   <div id="adminPanel" class="hidden">
-    <h2 class="text-xl font-semibold mb-4">Zarządzanie strefami i użytkownikami</h2>
+    <h2 class="text-xl font-semibold mb-4">Zarządzanie użytkownikami i strefami</h2>
+
+    <div class="mb-6">
+      <h3 class="font-bold">Dodaj użytkownika</h3>
+      <input id="userName" placeholder="Imię i nazwisko" class="border p-1 rounded">
+      <button id="addUser" class="bg-blue-500 text-white px-2 py-1 rounded">Dodaj</button>
+      <ul id="usersList" class="mt-2"></ul>
+    </div>
 
     <div class="mb-6">
       <h3 class="font-bold">Dodaj strefę</h3>
       <input id="zoneName" placeholder="Nazwa strefy" class="border p-1 rounded">
       <input id="zoneColor" type="color" value="#00ff00">
       <button id="addZone" class="bg-blue-500 text-white px-2 py-1 rounded">Dodaj</button>
+      <ul id="zonesList" class="mt-2"></ul>
     </div>
-
-    <div class="mb-6">
-      <h3 class="font-bold">Dodaj użytkownika</h3>
-      <input id="userName" placeholder="Imię i nazwisko" class="border p-1 rounded">
-      <button id="addUser" class="bg-blue-500 text-white px-2 py-1 rounded">Dodaj</button>
-    </div>
-
-    <h3 class="font-bold mb-2">Statystyki</h3>
-    <div id="stats" class="mb-6 text-gray-700"></div>
-
-    <h3 class="font-bold mb-2">Lista użytkowników</h3>
-    <table class="w-full bg-white shadow rounded">
-      <thead>
-        <tr class="bg-gray-200">
-          <th class="p-2">Użytkownik</th>
-          <th class="p-2">Strefa</th>
-          <th class="p-2">Przypisz</th>
-        </tr>
-      </thead>
-      <tbody id="usersTable"></tbody>
-    </table>
   </div>
 
   <script type="module" src="./js/admin.js"></script>
