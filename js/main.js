@@ -8,12 +8,14 @@ const loginBtn = document.getElementById("loginBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 const userZone = document.getElementById("userZone");
 const zoneUsers = document.getElementById("zoneUsers");
+const loggedAs = document.getElementById("loggedAs"); // ✅ dodane
 
 let currentUser = localStorage.getItem("username");
 
 // jeśli użytkownik jest w localStorage, pokaz aplikację
 if (currentUser) {
   showApp(currentUser);
+  if (loggedAs) loggedAs.textContent = `Zalogowany jako: ${currentUser}`;
 }
 
 // logowanie – tylko istniejący użytkownicy
@@ -25,14 +27,12 @@ loginBtn.addEventListener("click", async () => {
   const snapshot = await get(userRef);
 
   if (!snapshot.exists()) {
-  return alert("Użytkownik nie istnieje. Skontaktuj się z administratorem.");
-}
+    return alert("Użytkownik nie istnieje. Skontaktuj się z administratorem.");
+  }
 
-const user = snapshot.val(); // <- pobierz dane użytkownika z Firebase
-document.getElementById("loggedAs").textContent = `Zalogowany jako: ${user.name}`;
+  const user = snapshot.val(); // ✅ pobierz dane użytkownika
+  if (loggedAs) loggedAs.textContent = `Zalogowany jako: ${user.name}`; // ✅ ustaw nazwę użytkownika
 
-  
-  // DEBUG
   console.log("Logowanie użytkownika:", name);
   console.log("Referencja Firebase:", userRef);
 
@@ -68,6 +68,8 @@ function showApp(name) {
   loginDiv.classList.add("hidden");
   appDiv.classList.remove("hidden");
   currentUser = name;
+
+  if (loggedAs) loggedAs.textContent = `Zalogowany jako: ${name}`; // ✅ działa też przy automatycznym logowaniu
 
   const userRef = ref(db, "users/" + formatKey(name));
 
