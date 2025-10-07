@@ -1,4 +1,4 @@
-import { db, ref, get, onValue, set, update } from "../firebase-config.js";
+import { db, ref, get, onValue, update } from "../firebase-config.js";
 
 // elementy DOM
 const loginDiv = document.getElementById("login");
@@ -16,7 +16,7 @@ if (currentUser) {
   showApp(currentUser);
 }
 
-// logowanie
+// logowanie – tylko istniejący użytkownicy
 loginBtn.addEventListener("click", async () => {
   const name = usernameInput.value.trim();
   if (!name) return alert("Podaj imię i nazwisko!");
@@ -34,28 +34,15 @@ loginBtn.addEventListener("click", async () => {
   showApp(name);
 });
 
-// wylogowanie
+// wylogowanie – czyści online i strefę
 logoutBtn.addEventListener("click", async () => {
   const name = localStorage.getItem("username");
   if (name) {
-    // ustawiamy online = false i czyścimy strefę
     await update(ref(db, "users/" + formatKey(name)), { online: false, zone: null });
   }
   localStorage.removeItem("username");
   location.reload();
 });
-
-// upewnienie się, że użytkownik istnieje w bazie i ustawienie online = true
-async function ensureUserExists(name) {
-  const userRef = ref(db, "users/" + formatKey(name));
-  const snapshot = await get(userRef);
-
-  if (!snapshot.exists()) {
-    await set(userRef, { name: name, zone: null, online: true });
-  } else {
-    await update(userRef, { online: true });
-  }
-}
 
 // formatowanie nazwy użytkownika na klucz w Firebase
 function formatKey(name) {
@@ -81,9 +68,12 @@ function showApp(name) {
     loadZoneUsers(zone);
   });
 
-  // ustawienie offline przy zamknięciu strony
+  // ustawienie offline przy zamknięciu strony (strefa pozostaje)
   window.addEventListener("beforeunload", async () => {
-    await update(ref(db, "users/" + formatKey(name)), { online: false });
+    const name = localStorage.getItem("username");
+    if (name) {
+      await update(ref(db, "users/" + formatKey(name)), { online: false });
+    }
   });
 }
 
