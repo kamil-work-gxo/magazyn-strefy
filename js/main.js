@@ -30,7 +30,8 @@ loginBtn.addEventListener("click", async () => {
 logoutBtn.addEventListener("click", async () => {
   const name = localStorage.getItem("username");
   if (name) {
-    await update(ref(db, "users/" + formatKey(name)), { online: false });
+    // ustawiamy online = false i czyścimy strefę
+    await update(ref(db, "users/" + formatKey(name)), { online: false, zone: null });
   }
   localStorage.removeItem("username");
   location.reload();
